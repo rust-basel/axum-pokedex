@@ -2,18 +2,25 @@ pub enum BusinessError {
     NotFound,
 }
 
-use crate::storage::Storage;
+use crate::storage::{self, Storage};
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct Pokemon {
     name: String,
     id: usize,
 }
 
-fn create_pokemon<S>(pokemon: Pokemon, storage: &S) -> Result<(), BusinessError>
+impl From<storage::StorageError> for BusinessError {
+    fn from(value: storage::StorageError) -> Self {
+        BusinessError::NotFound
+    }
+}
+
+fn create_pokemon<S>(pokemon: Pokemon, storage: &mut S) -> Result<(), BusinessError>
 where
     S: Storage,
 {
+    storage.store_pokemon(pokemon)?;
     Ok(())
 }
 
@@ -39,25 +46,19 @@ mod tests {
 
     #[test]
     fn create_pokemon_when_called_with_pokemon_then_stores_pokemon_in_storage() {
-        // mock
+        // given
         let pokemon = Pokemon {
             name: String::from("Pikachu"),
             id: 24usize,
         };
         let mut mock = MockStorage::new();
         mock.expect_store_pokemon()
-            .with(eq(pokemon))
+            .with(eq(pokemon.clone()))
             .times(1)
             .returning(|_| Ok(()));
 
-        // given
-        let pokemon = Pokemon {
-            name: String::from("Pikachu"),
-            id: 24usize,
-        };
-
         // when
-        let result = create_pokemon(pokemon, &mock);
+        let result = create_pokemon(pokemon, &mut mock);
 
         // then
         assert!(result.is_ok());
