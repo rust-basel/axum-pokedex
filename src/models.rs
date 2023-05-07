@@ -1,5 +1,5 @@
-#[derive(serde::Deserialize, Debug)]
+#[derive(serde::Deserialize, serde::Serialize, Debug)]
 pub struct PokemonCreateRequest {
-    name: String,
-    id: usize,
+    pub name: String,
+    pub id: usize,
 }
