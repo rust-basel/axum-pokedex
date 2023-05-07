@@ -1,6 +1,16 @@
+#[cfg(test)]
+use mockall::{automock, mock, predicate::*};
+
+use crate::business_logic::Pokemon;
+
+pub enum StorageError {
+    NotFound,
+}
+
+#[cfg_attr(test, automock)]
 pub trait Storage {
-    fn store_pokemon(pokemon: Pokemon) -> Result<(), Box<dyn Error>>;
-    fn get_pokemon(id: usize) -> Result<Pokemon, Box<dyn Error>>;
-    fn delete_pokomen(id: usize) -> Result<Pokemon, Box<dyn Error>>;
-    fn update_pokemon(pokemon: Pokemon) -> Result<(), Box<dyn Error>>;
+    fn store_pokemon(&mut self, pokemon: Pokemon) -> Result<(), StorageError>;
+    fn get_pokemon(&self, id: usize) -> Result<Pokemon, StorageError>;
+    fn delete_pokomen(&self, id: usize) -> Result<Pokemon, StorageError>;
+    fn update_pokemon(&self, pokemon: Pokemon) -> Result<(), StorageError>;
 }
