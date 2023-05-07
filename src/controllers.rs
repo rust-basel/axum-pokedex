@@ -1,4 +1,4 @@
-use axum::{extract, Json};
+use axum::extract;
 
 use crate::models;
 

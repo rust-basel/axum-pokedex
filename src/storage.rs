@@ -1,5 +1,5 @@
 #[cfg(test)]
-use mockall::{automock, mock, predicate::*};
+use mockall::{automock, predicate::*};
 
 use crate::business_logic::Pokemon;
 
