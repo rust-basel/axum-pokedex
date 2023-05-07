@@ -6,8 +6,8 @@ use crate::storage::{self, Storage};
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct Pokemon {
-    name: String,
-    id: usize,
+    pub(crate) name: String,
+    pub(crate) id: usize,
 }
 
 impl From<storage::StorageError> for BusinessError {

@@ -6,6 +6,7 @@ use std::net::SocketAddr;
 
 mod business_logic;
 mod controllers;
+mod key_value_storage;
 mod models;
 mod storage;
 
