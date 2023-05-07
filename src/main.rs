@@ -2,7 +2,11 @@ use axum::{
     routing::{get, post},
     Router,
 };
-use std::net::SocketAddr;
+use key_value_storage::KeyValueStorage;
+use std::{
+    net::SocketAddr,
+    sync::{Arc, Mutex, RwLock},
+};
 
 mod business_logic;
 mod controllers;
@@ -29,9 +33,11 @@ async fn handler() -> &'static str {
 
 #[allow(dead_code)]
 fn app() -> Router {
+    let database = Arc::new(Mutex::new(KeyValueStorage::new()));
     let app = Router::new()
         .route("/", get(handler))
-        .route("/pokemon/create", post(Controller::create_pokemon));
+        .route("/pokemon/create", post(Controller::create_pokemon))
+        .with_state(database);
     app
 }
 

@@ -16,7 +16,7 @@ impl From<storage::StorageError> for BusinessError {
     }
 }
 
-fn create_pokemon<S>(pokemon: Pokemon, storage: &mut S) -> Result<(), BusinessError>
+pub fn create_pokemon<S>(pokemon: Pokemon, storage: &mut S) -> Result<(), BusinessError>
 where
     S: Storage,
 {
