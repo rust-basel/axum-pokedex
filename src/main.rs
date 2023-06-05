@@ -37,6 +37,7 @@ fn app() -> Router {
     let app = Router::new()
         .route("/", get(handler))
         .route("/pokemon/create", post(Controller::create_pokemon))
+        .route("/pokemon/index", get(Controller::pokemon_index))
         .with_state(database);
     app
 }
@@ -59,7 +60,7 @@ mod tests {
             name: String::from("Glumanda"),
             id: 6usize,
         };
-        let request = Request::builder()
+        let create_request = Request::builder()
             .method(http::Method::POST)
             .uri("/pokemon/create")
             .header(http::header::CONTENT_TYPE, "application/json")
@@ -67,9 +68,31 @@ mod tests {
             .unwrap();
 
         // when
-        let response = app.oneshot(request).await.unwrap();
+        let response = &app.clone().oneshot(create_request).await.unwrap();
 
         // then
         assert_eq!(response.status(), StatusCode::OK);
+
+        let glumanda_list_request = Request::builder()
+            .method(http::Method::GET)
+            .uri("/pokemon/index?sort_field=Name&sort_direction=Ascending&search=Glumanda")
+            .body(Body::empty())
+            .unwrap();
+
+        let response = &app.clone().oneshot(glumanda_list_request).await.unwrap();
+
+        assert_eq!(response.status(), StatusCode::OK);
+        //TODO: check if response body contains Glumanda
+
+        let bulbasaur_list_request = Request::builder()
+            .method(http::Method::GET)
+            .uri("/pokemon/index?sort_field=Name&sort_direction=Ascending&search=Bulbasaur")
+            .body(Body::empty())
+            .unwrap();
+
+        let response = &app.clone().oneshot(bulbasaur_list_request).await.unwrap();
+
+        assert_eq!(response.status(), StatusCode::OK);
+        //TODO: result should be empty
     }
 }

@@ -35,6 +35,41 @@ impl Storage for KeyValueStorage {
     ) -> Result<(), crate::storage::StorageError> {
         todo!()
     }
+
+    fn index_pokemons(
+        &self,
+        index_request: crate::models::PokemonIndexRequest,
+    ) -> Result<Vec<crate::models::PokemonList>, crate::storage::StorageError> {
+        let mut pokemon_list: Vec<crate::models::PokemonList> = Vec::new();
+        self.inner.iter().for_each(|(key, value)| {
+            pokemon_list.push(crate::models::PokemonList {
+                name: value.name.clone(),
+                id: *key,
+            });
+        });
+
+        //sort pokemon_list by name ascending if index_request.sort == Name
+        match (index_request.sort_field, index_request.sort_direction) {
+            (crate::models::PokemonIndexField::Name, crate::models::Direction::Ascending) => {
+                pokemon_list.sort_by(|a, b| a.name.cmp(&b.name))
+            }
+            (crate::models::PokemonIndexField::Name, crate::models::Direction::Descending) => {
+                pokemon_list.sort_by(|b, a| a.name.cmp(&b.name))
+            }
+            (crate::models::PokemonIndexField::Id, crate::models::Direction::Ascending) => (),
+            (crate::models::PokemonIndexField::Id, crate::models::Direction::Descending) => {
+                pokemon_list = pokemon_list.into_iter().rev().collect()
+            }
+        };
+
+        // filter pokemon_list by index_request.search
+        let pokemon_list: Vec<crate::models::PokemonList> = pokemon_list
+            .into_iter()
+            .filter(|pokemon| pokemon.name.contains(&index_request.search))
+            .collect();
+
+        Ok(pokemon_list)
+    }
 }
 
 impl KeyValueStorage {

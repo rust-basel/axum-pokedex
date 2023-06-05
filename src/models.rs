@@ -15,6 +15,43 @@ impl From<PokemonCreateRequest> for Pokemon {
     }
 }
 
+#[derive(serde::Deserialize, serde::Serialize, Debug)]
+pub enum PokemonIndexField {
+    Name,
+    Id,
+}
+
+impl Default for PokemonIndexField {
+    fn default() -> Self {
+        Self::Name
+    }
+}
+
+#[derive(serde::Deserialize, serde::Serialize, Debug)]
+pub enum Direction {
+    Ascending,
+    Descending,
+}
+
+impl Default for Direction {
+    fn default() -> Self {
+        Self::Ascending
+    }
+}
+
+#[derive(serde::Deserialize, serde::Serialize, Debug, Default)]
+pub struct PokemonIndexRequest {
+    pub sort_field: PokemonIndexField,
+    pub sort_direction: Direction,
+    pub search: String,
+}
+
+#[derive(serde::Deserialize, serde::Serialize, Debug)]
+pub struct PokemonList {
+    pub name: String,
+    pub id: usize,
+}
+
 #[cfg(test)]
 mod tests {
     use crate::business_logic::Pokemon;
