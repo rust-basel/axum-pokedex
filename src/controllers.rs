@@ -8,7 +8,7 @@ use axum::{
 };
 
 use crate::business_logic::{get_pokemon, BusinessError, Pokemon};
-use crate::models::{IdQuery, PokemonGetResponse};
+use crate::models::PokemonGetResponse;
 use crate::{business_logic::create_pokemon, models, storage::Storage};
 
 pub struct Controller;

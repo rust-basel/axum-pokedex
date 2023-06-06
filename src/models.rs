@@ -6,11 +6,6 @@ pub struct PokemonCreateRequest {
     pub id: usize,
 }
 
-#[derive(serde::Deserialize)]
-pub struct IdQuery {
-    pub id: usize,
-}
-
 #[derive(serde::Serialize, serde::Deserialize, Debug, PartialEq)]
 pub struct PokemonGetResponse {
     pub name: String,
