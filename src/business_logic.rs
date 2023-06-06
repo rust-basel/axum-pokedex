@@ -1,3 +1,4 @@
+#[derive(Debug)]
 pub enum BusinessError {
     NotFound,
 }
@@ -32,12 +33,13 @@ fn delete_pokomen(id: usize) -> Result<(), BusinessError> {
     todo!()
 }
 
-fn get_pokemon(id: usize) -> Result<(), BusinessError> {
-    todo!()
+pub fn get_pokemon<S: Storage>(id: usize, storage: &S) -> Result<Pokemon, BusinessError> {
+    Ok(storage.get_pokemon(id)?)
 }
 
 #[cfg(test)]
 mod tests {
+    use crate::business_logic::get_pokemon;
     use mockall::predicate::eq;
 
     use crate::storage::MockStorage;
@@ -45,7 +47,8 @@ mod tests {
     use super::{create_pokemon, Pokemon};
 
     #[test]
-    fn create_pokemon_when_called_with_pokemon_then_stores_pokemon_in_storage() {
+    fn create_pokemon_given_valid_pokemon_when_called_with_pokemon_then_stores_pokemon_in_storage()
+    {
         // given
         let pokemon = Pokemon {
             name: String::from("Pikachu"),
@@ -62,5 +65,33 @@ mod tests {
 
         // then
         assert!(result.is_ok());
+    }
+
+    #[test]
+    fn get_pokemon_given_id_when_called_with_ok_mock_then_returns_pokemon() {
+        // given
+        let id = 6;
+        let mut mock = MockStorage::new();
+        let expected_pokemon = Pokemon {
+            name: "Glumanda".to_string(),
+            id: 6,
+        };
+        mock.expect_get_pokemon()
+            .with(eq(id))
+            .times(1)
+            .returning(move |_| Ok(expected_pokemon.clone()));
+
+        // when
+        let result = get_pokemon(6, &mock);
+
+        // then
+        assert!(result.is_ok());
+        assert_eq!(
+            result.unwrap(),
+            Pokemon {
+                name: "Glumanda".to_string(),
+                id: 6
+            }
+        );
     }
 }

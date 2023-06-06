@@ -34,6 +34,10 @@ impl KeyValueStorage {
             inner: HashMap::new(),
         }
     }
+
+    pub fn with(storage: HashMap<usize, Pokemon>) -> Self {
+        Self { inner: storage }
+    }
 }
 
 #[cfg(test)]
