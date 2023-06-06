@@ -442,6 +442,7 @@ name = "pokedex"
 version = "0.1.0"
 dependencies = [
  "axum",
+ "hyper",
  "mockall",
  "serde",
  "serde_json",

@@ -53,6 +53,7 @@ mod tests {
 
     use crate::business_logic::Pokemon;
     use crate::key_value_storage::KeyValueStorage;
+    use crate::models::PokemonGetResponse;
     use crate::{app, models};
 
     #[tokio::test]
@@ -104,5 +105,14 @@ mod tests {
 
         // then
         assert_eq!(response.status(), StatusCode::OK);
+        let body = hyper::body::to_bytes(response.into_body()).await.unwrap();
+        let body: PokemonGetResponse = serde_json::from_slice(&body).unwrap();
+        assert_eq!(
+            body,
+            PokemonGetResponse {
+                name: "Glumanda".to_string(),
+                id: 6
+            }
+        );
     }
 }
