@@ -3,7 +3,7 @@ use mockall::{automock, predicate::*};
 
 use crate::business_logic::Pokemon;
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum StorageError {
     NotFound,
 }
