@@ -29,8 +29,12 @@ fn update_pokemon(pokemon: Pokemon) -> Result<(), BusinessError> {
     todo!()
 }
 
-fn delete_pokomen(id: usize) -> Result<(), BusinessError> {
-    todo!()
+fn delete_pokomen<S>(id: usize, storage: &mut S) -> Result<(), BusinessError>
+where
+    S: Storage,
+{
+    storage.delete_pokemon(id)?;
+    Ok(())
 }
 
 pub fn get_pokemon<S: Storage>(id: usize, storage: &S) -> Result<Pokemon, BusinessError> {
@@ -39,7 +43,7 @@ pub fn get_pokemon<S: Storage>(id: usize, storage: &S) -> Result<Pokemon, Busine
 
 #[cfg(test)]
 mod tests {
-    use crate::business_logic::get_pokemon;
+    use crate::business_logic::{delete_pokomen, get_pokemon};
     use mockall::predicate::eq;
 
     use crate::storage::MockStorage;
@@ -93,5 +97,22 @@ mod tests {
                 id: 6
             }
         );
+    }
+
+    #[test]
+    fn delete_pokemon_given_pokemon_when_called_with_id_then_returns_ok() {
+        // given
+        let id = 6;
+        let mut mock = MockStorage::new();
+        mock.expect_delete_pokemon()
+            .with(eq(id))
+            .times(1)
+            .returning(|_| Ok(()));
+
+        // when
+        let result = delete_pokomen(6, &mut mock);
+
+        // then
+        assert!(result.is_ok());
     }
 }
