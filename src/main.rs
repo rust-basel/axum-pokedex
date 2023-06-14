@@ -1,3 +1,4 @@
+use axum::routing::delete;
 use axum::{
     routing::{get, post},
     Router,
@@ -38,6 +39,7 @@ fn app(storage: KeyValueStorage) -> Router {
         .route("/", get(handler))
         .route("/pokemon/create", post(Controller::create_pokemon))
         .route("/pokemon/:id", get(Controller::get_pokemon))
+        .route("/pokemon/:id", delete(Controller::delete_pokemon))
         .with_state(database);
     app
 }
@@ -114,5 +116,35 @@ mod tests {
                 id: 6
             }
         );
+    }
+
+    #[tokio::test]
+    async fn delete_pokemon_given_stored_pokemon_when_called_with_id_then_returns_http_ok_no_content(
+    ) {
+        // given
+        let id = 6;
+        let mut inner_storage = HashMap::new();
+        inner_storage.insert(
+            id,
+            Pokemon {
+                name: "Glumanda".to_string(),
+                id: 6,
+            },
+        );
+        let storage = KeyValueStorage::with(inner_storage);
+        let app = app(storage);
+
+        let delete_request = Request::builder()
+            .method(http::Method::DELETE)
+            .uri(format!("/pokemon/{id}"))
+            .header(http::header::CONTENT_TYPE, "application/json")
+            .body(Body::empty())
+            .unwrap();
+
+        // when
+        let response = app.oneshot(delete_request).await.unwrap();
+
+        // then
+        assert_eq!(response.status(), StatusCode::NO_CONTENT);
     }
 }

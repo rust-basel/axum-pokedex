@@ -29,7 +29,7 @@ fn update_pokemon(pokemon: Pokemon) -> Result<(), BusinessError> {
     todo!()
 }
 
-fn delete_pokomen<S>(id: usize, storage: &mut S) -> Result<(), BusinessError>
+pub fn delete_pokemon<S>(id: usize, storage: &mut S) -> Result<(), BusinessError>
 where
     S: Storage,
 {
@@ -43,7 +43,7 @@ pub fn get_pokemon<S: Storage>(id: usize, storage: &S) -> Result<Pokemon, Busine
 
 #[cfg(test)]
 mod tests {
-    use crate::business_logic::{delete_pokomen, get_pokemon};
+    use crate::business_logic::{delete_pokemon, get_pokemon};
     use mockall::predicate::eq;
 
     use crate::storage::MockStorage;
@@ -110,7 +110,7 @@ mod tests {
             .returning(|_| Ok(()));
 
         // when
-        let result = delete_pokomen(6, &mut mock);
+        let result = delete_pokemon(6, &mut mock);
 
         // then
         assert!(result.is_ok());
