@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 
+use crate::storage::StorageError;
 use crate::{business_logic::Pokemon, storage::Storage};
 
 pub struct KeyValueStorage {
@@ -19,8 +20,9 @@ impl Storage for KeyValueStorage {
         }
     }
 
-    fn delete_pokomen(&self, id: usize) -> Result<Pokemon, crate::storage::StorageError> {
-        todo!()
+    fn delete_pokemon(&mut self, id: usize) -> Result<(), StorageError> {
+        self.inner.remove(&id);
+        Ok(())
     }
 
     fn update_pokemon(&self, pokemon: Pokemon) -> Result<(), crate::storage::StorageError> {
@@ -106,5 +108,27 @@ mod tests {
         // then
         assert!(result.is_err());
         assert_eq!(result.unwrap_err(), storage::StorageError::NotFound);
+    }
+
+    #[test]
+    fn delete_pokemon_given_id_with_when_called_with_pokemon_then_deletes_it() {
+        // given
+        let id = 6;
+        let mut storage = HashMap::new();
+        storage.insert(
+            id,
+            Pokemon {
+                name: "Glumanda".to_string(),
+                id,
+            },
+        );
+        let mut storage = KeyValueStorage::with(storage);
+
+        // when
+        let result = storage.delete_pokemon(id);
+
+        // then
+        assert!(result.is_ok());
+        assert_eq!(storage.inner.get(&id), None);
     }
 }

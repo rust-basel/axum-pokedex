@@ -7,7 +7,7 @@ use axum::{
     Json,
 };
 
-use crate::business_logic::{get_pokemon, BusinessError, Pokemon};
+use crate::business_logic::{delete_pokemon, get_pokemon, BusinessError, Pokemon};
 use crate::models::PokemonGetResponse;
 use crate::{business_logic::create_pokemon, models, storage::Storage};
 
@@ -35,6 +35,17 @@ impl Controller {
         match get_pokemon(id, &mut *db) {
             Ok(pokemon) => Ok(Json(PokemonGetResponse::from(pokemon))),
             Err(_) => Err(StatusCode::NOT_FOUND),
+        }
+    }
+
+    pub async fn delete_pokemon<T: Storage>(
+        State(db): State<Arc<Mutex<T>>>,
+        Path(id): Path<usize>,
+    ) -> Result<StatusCode, StatusCode> {
+        let mut db = db.lock().unwrap();
+        match delete_pokemon(id, &mut *db) {
+            Ok(()) => Ok(StatusCode::NO_CONTENT),
+            _ => Err(StatusCode::INTERNAL_SERVER_ERROR),
         }
     }
 }
