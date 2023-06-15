@@ -32,7 +32,6 @@ async fn handler() -> &'static str {
     "Hello, world!"
 }
 
-#[allow(dead_code)]
 fn app(storage: KeyValueStorage) -> Router {
     let database = Arc::new(Mutex::new(storage));
     let app = Router::new()
