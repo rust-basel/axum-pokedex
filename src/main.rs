@@ -1,4 +1,4 @@
-use axum::routing::delete;
+use axum::routing::{delete, patch};
 use axum::{
     routing::{get, post},
     Router,
@@ -40,6 +40,7 @@ fn app(storage: KeyValueStorage) -> Router {
         .route("/pokemon/create", post(Controller::create_pokemon))
         .route("/pokemon/:id", get(Controller::get_pokemon))
         .route("/pokemon/:id", delete(Controller::delete_pokemon))
+        .route("/pokemon/:id", patch(Controller::update_pokemon))
         .with_state(database);
     app
 }

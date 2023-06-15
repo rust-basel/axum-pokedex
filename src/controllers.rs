@@ -48,4 +48,12 @@ impl Controller {
             _ => Err(StatusCode::INTERNAL_SERVER_ERROR),
         }
     }
+
+    pub async fn update_pokemon<T: Storage>(
+        State(_db): State<Arc<Mutex<T>>>,
+        Path(_id): Path<usize>,
+        Json(_update_request): Json<models::PokemonUpdateRequest>,
+    ) -> Result<StatusCode, StatusCode> {
+        todo!()
+    }
 }
