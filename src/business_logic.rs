@@ -21,8 +21,7 @@ pub fn create_pokemon<S>(pokemon: Pokemon, storage: &mut S) -> Result<(), Busine
 where
     S: Storage,
 {
-    storage.store_pokemon(pokemon)?;
-    Ok(())
+    Ok(storage.store_pokemon(pokemon)?)
 }
 
 fn update_pokemon<S>(pokemon: Pokemon, storage: &mut S) -> Result<(), BusinessError>
