@@ -8,14 +8,14 @@ pub struct KeyValueStorage {
 }
 
 impl Storage for KeyValueStorage {
-    fn store_pokemon(&mut self, pokemon: Pokemon) -> Result<(), crate::storage::StorageError> {
+    fn store_pokemon(&mut self, pokemon: Pokemon) -> Result<(), StorageError> {
         self.inner.insert(pokemon.id, pokemon);
         Ok(())
     }
 
-    fn get_pokemon(&self, id: usize) -> Result<Pokemon, crate::storage::StorageError> {
+    fn get_pokemon(&self, id: usize) -> Result<Pokemon, StorageError> {
         match self.inner.get(&id) {
-            None => Err(crate::storage::StorageError::NotFound),
+            None => Err(StorageError::NotFound),
             Some(p) => Ok(p.clone()),
         }
     }
@@ -25,8 +25,14 @@ impl Storage for KeyValueStorage {
         Ok(())
     }
 
-    fn update_pokemon(&self, pokemon: Pokemon) -> Result<(), crate::storage::StorageError> {
-        todo!()
+    fn update_pokemon(&mut self, pokemon: Pokemon) -> Result<(), StorageError> {
+        match self.inner.get_mut(&pokemon.id) {
+            Some(p) => {
+                p.name = pokemon.name;
+                Ok(())
+            }
+            None => Err(StorageError::NotFound),
+        }
     }
 }
 
@@ -44,6 +50,7 @@ impl KeyValueStorage {
 
 #[cfg(test)]
 mod tests {
+    use crate::storage::StorageError;
     use crate::{business_logic::Pokemon, storage, storage::Storage};
     use std::collections::HashMap;
 
@@ -130,5 +137,50 @@ mod tests {
         // then
         assert!(result.is_ok());
         assert_eq!(storage.inner.get(&id), None);
+    }
+
+    #[test]
+    fn update_pokemon_given_pokemon_when_called_with_pokemon_then_adjusts_name() {
+        // given
+        let id = 6;
+        let mut storage = HashMap::new();
+        storage.insert(
+            id,
+            Pokemon {
+                name: "Glumanda".to_string(),
+                id,
+            },
+        );
+        let mut storage = KeyValueStorage::with(storage);
+        let expected_pokemon = Pokemon {
+            name: "NotGlumanda".to_string(),
+            id,
+        };
+
+        // when
+        let result = storage.update_pokemon(expected_pokemon.clone());
+
+        // then
+        assert!(result.is_ok());
+        assert_eq!(storage.inner.get(&id), Some(&expected_pokemon));
+    }
+
+    #[test]
+    fn update_pokemon_given_no_pokemon_when_called_with_pokemon_then_err_not_found() {
+        // given
+        let id = 6;
+        let storage = HashMap::new();
+        let mut storage = KeyValueStorage::with(storage);
+        let expected_pokemon = Pokemon {
+            name: "NotGlumanda".to_string(),
+            id,
+        };
+
+        // when
+        let result = storage.update_pokemon(expected_pokemon.clone());
+
+        // then
+        assert!(result.is_err());
+        assert_eq!(result.unwrap_err(), StorageError::NotFound);
     }
 }
