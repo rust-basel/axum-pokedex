@@ -1,9 +1,9 @@
-#[derive(Debug)]
+#[derive(PartialEq, Debug)]
 pub enum BusinessError {
     NotFound,
 }
 
-use crate::storage::{self, Storage};
+use crate::storage::{Storage, StorageError};
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct Pokemon {
@@ -11,8 +11,8 @@ pub struct Pokemon {
     pub(crate) id: usize,
 }
 
-impl From<storage::StorageError> for BusinessError {
-    fn from(value: storage::StorageError) -> Self {
+impl From<StorageError> for BusinessError {
+    fn from(_value: StorageError) -> Self {
         BusinessError::NotFound
     }
 }
@@ -21,12 +21,14 @@ pub fn create_pokemon<S>(pokemon: Pokemon, storage: &mut S) -> Result<(), Busine
 where
     S: Storage,
 {
-    storage.store_pokemon(pokemon)?;
-    Ok(())
+    Ok(storage.store_pokemon(pokemon)?)
 }
 
-fn update_pokemon(pokemon: Pokemon) -> Result<(), BusinessError> {
-    todo!()
+pub fn update_pokemon<S>(pokemon: Pokemon, storage: &mut S) -> Result<(), BusinessError>
+where
+    S: Storage,
+{
+    Ok(storage.update_pokemon(pokemon)?)
 }
 
 pub fn delete_pokemon<S>(id: usize, storage: &mut S) -> Result<(), BusinessError>
@@ -43,10 +45,10 @@ pub fn get_pokemon<S: Storage>(id: usize, storage: &S) -> Result<Pokemon, Busine
 
 #[cfg(test)]
 mod tests {
-    use crate::business_logic::{delete_pokemon, get_pokemon};
+    use crate::business_logic::{delete_pokemon, get_pokemon, update_pokemon, BusinessError};
     use mockall::predicate::eq;
 
-    use crate::storage::MockStorage;
+    use crate::storage::{MockStorage, StorageError};
 
     use super::{create_pokemon, Pokemon};
 
@@ -111,6 +113,47 @@ mod tests {
 
         // when
         let result = delete_pokemon(6, &mut mock);
+
+        // then
+        assert!(result.is_ok());
+    }
+
+    #[test]
+    fn update_pokemon_given_bad_mock_when_called_then_returns_not_found() {
+        // given
+        let mut mock = MockStorage::new();
+        mock.expect_update_pokemon()
+            .times(1)
+            .returning(|_| Err(StorageError::NotFound));
+
+        // when
+        let result = update_pokemon(
+            Pokemon {
+                name: "Pika".to_string(),
+                id: 24,
+            },
+            &mut mock,
+        );
+
+        // then
+        assert!(result.is_err());
+        assert_eq!(result.unwrap_err(), BusinessError::NotFound);
+    }
+
+    #[test]
+    fn update_pokemon_given_good_mock_when_called_then_returns_ok() {
+        // given
+        let mut mock = MockStorage::new();
+        mock.expect_update_pokemon().times(1).returning(|_| Ok(()));
+
+        // when
+        let result = update_pokemon(
+            Pokemon {
+                name: "Pika".to_string(),
+                id: 24,
+            },
+            &mut mock,
+        );
 
         // then
         assert!(result.is_ok());

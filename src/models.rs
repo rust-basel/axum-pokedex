@@ -6,6 +6,11 @@ pub struct PokemonCreateRequest {
     pub id: usize,
 }
 
+#[derive(serde::Deserialize, serde::Serialize, Debug)]
+pub struct PokemonUpdateRequest {
+    pub name: Option<String>,
+}
+
 #[derive(serde::Serialize, serde::Deserialize, Debug, PartialEq)]
 pub struct PokemonGetResponse {
     pub name: String,

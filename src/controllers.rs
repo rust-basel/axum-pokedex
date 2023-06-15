@@ -1,13 +1,13 @@
 use std::sync::{Arc, Mutex};
 
-use axum::extract::{Path, Query};
+use axum::extract::{Path};
 use axum::{
     extract::{self, State},
     http::StatusCode,
     Json,
 };
 
-use crate::business_logic::{delete_pokemon, get_pokemon, BusinessError, Pokemon};
+use crate::business_logic::{delete_pokemon, get_pokemon, update_pokemon, BusinessError, Pokemon};
 use crate::models::PokemonGetResponse;
 use crate::{business_logic::create_pokemon, models, storage::Storage};
 
@@ -46,6 +46,23 @@ impl Controller {
         match delete_pokemon(id, &mut *db) {
             Ok(()) => Ok(StatusCode::NO_CONTENT),
             _ => Err(StatusCode::INTERNAL_SERVER_ERROR),
+        }
+    }
+
+    pub async fn update_pokemon<T: Storage>(
+        State(db): State<Arc<Mutex<T>>>,
+        Path(id): Path<usize>,
+        Json(update_request): Json<models::PokemonUpdateRequest>,
+    ) -> Result<StatusCode, StatusCode> {
+        match update_request.name {
+            None => todo!(),
+            Some(name) => {
+                let mut db = db.lock().unwrap();
+                match update_pokemon(Pokemon { name, id }, &mut *db /* storage */) {
+                    Ok(()) => Ok(StatusCode::NO_CONTENT),
+                    Err(BusinessError::NotFound) => Err(StatusCode::NOT_FOUND),
+                }
+            }
         }
     }
 }
