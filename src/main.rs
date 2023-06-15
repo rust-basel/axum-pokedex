@@ -6,7 +6,7 @@ use axum::{
 use key_value_storage::KeyValueStorage;
 use std::{
     net::SocketAddr,
-    sync::{Arc, Mutex, RwLock},
+    sync::{Arc, Mutex},
 };
 
 mod business_logic;

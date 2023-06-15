@@ -3,7 +3,7 @@ pub enum BusinessError {
     NotFound,
 }
 
-use crate::storage::{self, Storage, StorageError};
+use crate::storage::{Storage, StorageError};
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct Pokemon {
@@ -12,7 +12,7 @@ pub struct Pokemon {
 }
 
 impl From<StorageError> for BusinessError {
-    fn from(value: StorageError) -> Self {
+    fn from(_value: StorageError) -> Self {
         BusinessError::NotFound
     }
 }

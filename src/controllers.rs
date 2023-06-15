@@ -1,6 +1,6 @@
 use std::sync::{Arc, Mutex};
 
-use axum::extract::{Path, Query};
+use axum::extract::{Path};
 use axum::{
     extract::{self, State},
     http::StatusCode,
