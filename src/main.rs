@@ -36,7 +36,7 @@ fn app(storage: KeyValueStorage) -> Router {
     let database = Arc::new(Mutex::new(storage));
     let app = Router::new()
         .route("/", get(handler))
-        .route("/pokemon/create", post(Controller::create_pokemon))
+        .route("/pokemon", post(Controller::create_pokemon))
         .route("/pokemon/:id", get(Controller::get_pokemon))
         .route("/pokemon/:id", delete(Controller::delete_pokemon))
         .route("/pokemon/:id", patch(Controller::update_pokemon))
@@ -68,7 +68,7 @@ mod tests {
         };
         let request = Request::builder()
             .method(http::Method::POST)
-            .uri("/pokemon/create")
+            .uri("/pokemon")
             .header(http::header::CONTENT_TYPE, "application/json")
             .body(Body::from(serde_json::to_string(&json_payload).unwrap()))
             .unwrap();
