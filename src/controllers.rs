@@ -7,7 +7,7 @@ use axum::{
     Json,
 };
 
-use crate::business_logic::{delete_pokemon, get_pokemon, BusinessError, Pokemon};
+use crate::business_logic::{delete_pokemon, get_pokemon, update_pokemon, BusinessError, Pokemon};
 use crate::models::PokemonGetResponse;
 use crate::{business_logic::create_pokemon, models, storage::Storage};
 
@@ -50,10 +50,19 @@ impl Controller {
     }
 
     pub async fn update_pokemon<T: Storage>(
-        State(_db): State<Arc<Mutex<T>>>,
-        Path(_id): Path<usize>,
-        Json(_update_request): Json<models::PokemonUpdateRequest>,
+        State(db): State<Arc<Mutex<T>>>,
+        Path(id): Path<usize>,
+        Json(update_request): Json<models::PokemonUpdateRequest>,
     ) -> Result<StatusCode, StatusCode> {
-        todo!()
+        match update_request.name {
+            None => todo!(),
+            Some(name) => {
+                let mut db = db.lock().unwrap();
+                match update_pokemon(Pokemon { name, id }, &mut *db /* storage */) {
+                    Ok(()) => Ok(StatusCode::NO_CONTENT),
+                    Err(BusinessError::NotFound) => Err(StatusCode::NOT_FOUND),
+                }
+            }
+        }
     }
 }

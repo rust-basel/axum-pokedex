@@ -56,7 +56,7 @@ mod tests {
 
     use crate::business_logic::Pokemon;
     use crate::key_value_storage::KeyValueStorage;
-    use crate::models::PokemonGetResponse;
+    use crate::models::{PokemonGetResponse, PokemonUpdateRequest};
     use crate::{app, models};
 
     #[tokio::test]
@@ -144,6 +144,39 @@ mod tests {
 
         // when
         let response = app.oneshot(delete_request).await.unwrap();
+
+        // then
+        assert_eq!(response.status(), StatusCode::NO_CONTENT);
+    }
+
+    #[tokio::test]
+    async fn update_pokemon_given_stored_pokemon_when_called_with_id_then_returns_http_ok_no_content(
+    ) {
+        // given
+        let id = 6;
+        let mut inner_storage = HashMap::new();
+        inner_storage.insert(
+            id,
+            Pokemon {
+                name: "Glumanda".to_string(),
+                id: 6,
+            },
+        );
+        let storage = KeyValueStorage::with(inner_storage);
+        let app = app(storage);
+
+        let patch_json_body = PokemonUpdateRequest {
+            name: Some("LittleFirePokemon".to_string()),
+        };
+        let update_request = Request::builder()
+            .method(http::Method::PATCH)
+            .uri(format!("/pokemon/{id}"))
+            .header(http::header::CONTENT_TYPE, "application/json")
+            .body(Body::from(serde_json::to_string(&patch_json_body).unwrap()))
+            .unwrap();
+
+        // when
+        let response = app.oneshot(update_request).await.unwrap();
 
         // then
         assert_eq!(response.status(), StatusCode::NO_CONTENT);

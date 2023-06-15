@@ -24,7 +24,7 @@ where
     Ok(storage.store_pokemon(pokemon)?)
 }
 
-fn update_pokemon<S>(pokemon: Pokemon, storage: &mut S) -> Result<(), BusinessError>
+pub fn update_pokemon<S>(pokemon: Pokemon, storage: &mut S) -> Result<(), BusinessError>
 where
     S: Storage,
 {
