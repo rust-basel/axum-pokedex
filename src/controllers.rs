@@ -1,6 +1,6 @@
 use std::sync::{Arc, Mutex};
 
-use axum::extract::{Path};
+use axum::extract::Path;
 use axum::{
     extract::{self, State},
     http::StatusCode,
@@ -55,10 +55,10 @@ impl Controller {
         Json(update_request): Json<models::PokemonUpdateRequest>,
     ) -> Result<StatusCode, StatusCode> {
         match update_request.name {
-            None => todo!(),
+            None => Err(StatusCode::BAD_REQUEST),
             Some(name) => {
                 let mut db = db.lock().unwrap();
-                match update_pokemon(Pokemon { name, id }, &mut *db /* storage */) {
+                match update_pokemon(Pokemon { name, id }, &mut *db) {
                     Ok(()) => Ok(StatusCode::NO_CONTENT),
                     Err(BusinessError::NotFound) => Err(StatusCode::NOT_FOUND),
                 }
