@@ -6,11 +6,31 @@ pub struct PokemonCreateRequest {
     pub id: usize,
 }
 
+#[derive(serde::Deserialize, serde::Serialize, Debug)]
+pub struct PokemonUpdateRequest {
+    pub name: Option<String>,
+}
+
+#[derive(serde::Serialize, serde::Deserialize, Debug, PartialEq)]
+pub struct PokemonGetResponse {
+    pub name: String,
+    pub id: usize,
+}
+
 impl From<PokemonCreateRequest> for Pokemon {
     fn from(value: PokemonCreateRequest) -> Self {
         Pokemon {
             name: value.name,
             id: value.id,
+        }
+    }
+}
+
+impl From<Pokemon> for PokemonGetResponse {
+    fn from(p: Pokemon) -> Self {
+        PokemonGetResponse {
+            name: p.name,
+            id: p.id,
         }
     }
 }
