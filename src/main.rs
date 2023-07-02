@@ -56,7 +56,7 @@ mod tests {
     fn create_glumanda_test_pokemon() -> Pokemon {
         Pokemon {
             name: GLUMANDA_NAME.to_string(),
-            id: GLUMANDA_ID,
+            number: GLUMANDA_ID,
             pokemon_type: "Fire".to_string(),
             nick_name: "MyFirePokemon".to_string(),
         }
@@ -68,7 +68,7 @@ mod tests {
         let app = app(HashMap::new());
         let json_payload = PokemonCreate {
             name: GLUMANDA_NAME.to_string(),
-            id: GLUMANDA_ID,
+            number: GLUMANDA_ID,
             nick_name: "MyFirePokemon".to_string(),
             pokemon_type: "Fire".to_string(),
         };

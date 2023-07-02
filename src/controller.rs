@@ -18,7 +18,7 @@ pub async fn create_pokemon(
 ) -> StatusCode {
     let pokemon: Pokemon = pokemon_create_request.into();
     let mut db = db;
-    db.insert(pokemon.id, pokemon);
+    db.insert(pokemon.number, pokemon);
     StatusCode::CREATED
 }
 

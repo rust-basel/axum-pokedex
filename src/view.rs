@@ -2,7 +2,7 @@
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct PokemonCreate {
     pub name: String,
-    pub id: usize,
+    pub number: usize,
     pub nick_name: String,
     #[serde(rename = "type")]
     pub pokemon_type: String,
