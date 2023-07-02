@@ -177,9 +177,9 @@ mod tests {
     async fn delete_pokemon_given_stored_pokemon_when_called_with_id_then_returns_http_ok_no_content(
     ) {
         // given
-        let id = 6;
+        let id = GLUMANDA_ID;
         let mut db = HashMap::new();
-        db.insert(GLUMANDA_ID, create_glumanda_test_pokemon());
+        db.insert(id, create_glumanda_test_pokemon());
         let app = app(db);
 
         let delete_request = Request::builder()
@@ -200,9 +200,9 @@ mod tests {
     async fn update_pokemon_given_stored_pokemon_when_called_with_id_then_returns_http_ok_no_content(
     ) {
         // given
-        let id = 6;
+        let id = GLUMANDA_ID;
         let mut db = HashMap::new();
-        db.insert(GLUMANDA_ID, create_glumanda_test_pokemon());
+        db.insert(id, create_glumanda_test_pokemon());
         let app = app(db);
 
         let patch_json_body = PokemonUpdate {
