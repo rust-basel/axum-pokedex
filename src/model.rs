@@ -8,11 +8,6 @@ pub struct Pokemon {
     pub nick_name: String,
 }
 
-#[derive(PartialEq, Debug)]
-pub enum PokemonError {
-    NotFound,
-}
-
 impl From<PokemonCreate> for Pokemon {
     fn from(value: PokemonCreate) -> Self {
         Pokemon {
