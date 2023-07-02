@@ -20,7 +20,7 @@ impl From<PokemonCreate> for Pokemon {
     }
 }
 
-impl From<&Pokemon> for PokemonShow{
+impl From<&Pokemon> for PokemonShow {
     fn from(p: &Pokemon) -> Self {
         PokemonShow {
             name: p.name.clone(),

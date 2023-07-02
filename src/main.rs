@@ -7,7 +7,7 @@ use std::{
     net::SocketAddr,
 };
 use std::collections::HashMap;
-use crate::controller::controller::{create_pokemon, delete_pokemon, list_pokemon, show_pokemon, update_pokemon};
+use crate::controller::{create_pokemon, delete_pokemon, list_pokemon, show_pokemon, update_pokemon};
 
 mod model;
 mod view;
