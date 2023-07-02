@@ -10,9 +10,6 @@ pub struct PokemonUpdate {
     pub name: Option<String>,
 }
 
-#[derive(serde::Deserialize)]
-pub struct PokemonDelete {}
-
 #[derive(serde::Deserialize, serde::Serialize, Debug)]
 pub enum PokemonIndexField {
     Name,
