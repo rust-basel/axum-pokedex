@@ -1,13 +1,18 @@
-// write models
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct PokemonCreate {
     pub name: String,
-    pub id: usize,
+    pub number: usize,
+    pub nick_name: String,
+    #[serde(rename = "type")]
+    pub pokemon_type: String,
 }
 
-#[derive(serde::Serialize, serde::Deserialize)]
+#[derive(serde::Serialize, serde::Deserialize, Default)]
 pub struct PokemonUpdate {
     pub name: Option<String>,
+    pub nick_name: Option<String>,
+    #[serde(rename = "type")]
+    pub pokemon_type: Option<String>,
 }
 
 #[derive(serde::Deserialize, serde::Serialize, Debug)]
@@ -41,15 +46,11 @@ pub struct PokemonIndexRequest {
     pub search: String,
 }
 
-// read models
 #[derive(serde::Serialize, serde::Deserialize, Debug, PartialEq)]
 pub struct PokemonShow {
-    pub id: usize,
+    pub number: usize,
     pub name: String,
-}
-
-#[derive(serde::Serialize, serde::Deserialize)]
-pub struct PokemonList {
-    pub id: usize,
-    pub name: String,
+    pub nick_name: String,
+    #[serde(rename = "type")]
+    pub pokemon_type: String,
 }

@@ -1,7 +1,6 @@
-use crate::model::{Pokemon, PokemonError};
+use crate::model::Pokemon;
 use crate::view::{
-    Direction, PokemonCreate, PokemonIndexField, PokemonIndexRequest, PokemonList, PokemonShow,
-    PokemonUpdate,
+    Direction, PokemonCreate, PokemonIndexField, PokemonIndexRequest, PokemonShow, PokemonUpdate,
 };
 use axum::extract::Path;
 use axum::{
@@ -11,32 +10,38 @@ use axum::{
 };
 use axum_macros::debug_handler;
 use std::collections::HashMap;
+use std::ops::DerefMut;
+use std::sync::{Arc, Mutex};
+
+type ThreadSafeDb = Arc<Mutex<HashMap<usize, Pokemon>>>;
 
 #[debug_handler]
 pub async fn create_pokemon(
-    State(db): State<HashMap<usize, Pokemon>>,
+    State(db): State<ThreadSafeDb>,
     Json(pokemon_create_request): Json<PokemonCreate>,
 ) -> StatusCode {
+    let mut db = db.lock().unwrap();
     let pokemon: Pokemon = pokemon_create_request.into();
-    let mut db = db;
-    db.insert(pokemon.id, pokemon);
+    db.insert(pokemon.number, pokemon);
     StatusCode::CREATED
 }
 
 #[debug_handler]
 pub async fn list_pokemon(
-    State(db): State<HashMap<usize, Pokemon>>,
+    State(db): State<ThreadSafeDb>,
     index_request: extract::Query<PokemonIndexRequest>,
-) -> Json<Vec<PokemonList>> {
-    let pokemons = index_pokemons(db, index_request.0).unwrap_or(vec![]);
+) -> Json<Vec<PokemonShow>> {
+    let mut db = db.lock().unwrap();
+    let pokemons = index_pokemons(db.deref_mut(), index_request.0);
     Json(pokemons)
 }
 
 #[debug_handler]
 pub async fn show_pokemon(
-    State(db): State<HashMap<usize, Pokemon>>,
+    State(db): State<ThreadSafeDb>,
     Path(id): Path<usize>,
 ) -> Result<Json<PokemonShow>, StatusCode> {
+    let db = db.lock().unwrap();
     match db.get(&id) {
         Some(pokemon) => Ok(Json(PokemonShow::from(pokemon))),
         None => Err(StatusCode::NOT_FOUND),
@@ -45,10 +50,10 @@ pub async fn show_pokemon(
 
 #[debug_handler]
 pub async fn delete_pokemon(
-    State(db): State<HashMap<usize, Pokemon>>,
+    State(db): State<ThreadSafeDb>,
     Path(id): Path<usize>,
 ) -> Result<StatusCode, StatusCode> {
-    let mut db = db;
+    let mut db = db.lock().unwrap();
     match db.remove(&id) {
         Some(_) => Ok(StatusCode::NO_CONTENT),
         None => Err(StatusCode::NOT_FOUND),
@@ -57,44 +62,34 @@ pub async fn delete_pokemon(
 
 #[debug_handler]
 pub async fn update_pokemon(
-    State(db): State<HashMap<usize, Pokemon>>,
+    State(db): State<ThreadSafeDb>,
     Path(id): Path<usize>,
     Json(update_request): Json<PokemonUpdate>,
 ) -> Result<StatusCode, StatusCode> {
-    match update_request.name {
-        None => Err(StatusCode::BAD_REQUEST),
-        Some(name) => match do_update_pokemon(db, Pokemon { name, id }) {
-            Ok(()) => Ok(StatusCode::NO_CONTENT),
-            Err(PokemonError::NotFound) => Err(StatusCode::NOT_FOUND),
-        },
-    }
-}
-
-// helpers for update and index
-fn do_update_pokemon(
-    mut db: HashMap<usize, Pokemon>,
-    pokemon: Pokemon,
-) -> Result<(), PokemonError> {
-    match db.get_mut(&pokemon.id) {
-        Some(p) => {
-            p.name = pokemon.name;
-            Ok(())
+    let mut db = db.lock().unwrap();
+    let pokemon_to_update = db.get_mut(&id);
+    if let Some(pokemon) = pokemon_to_update {
+        if let Some(nick_name) = update_request.nick_name {
+            pokemon.nick_name = nick_name;
         }
-        None => Err(PokemonError::NotFound),
+        if let Some(name) = update_request.name {
+            pokemon.name = name;
+        }
+        if let Some(pokemon_type) = update_request.pokemon_type {
+            pokemon.pokemon_type = pokemon_type;
+        }
+
+        Ok(StatusCode::NO_CONTENT)
+    } else {
+        Err(StatusCode::NOT_FOUND)
     }
 }
 
 fn index_pokemons(
-    db: HashMap<usize, Pokemon>,
+    db: &mut HashMap<usize, Pokemon>,
     index_request: PokemonIndexRequest,
-) -> Result<Vec<PokemonList>, PokemonError> {
-    let mut pokemon_list: Vec<PokemonList> = Vec::new();
-    db.iter().for_each(|(key, value)| {
-        pokemon_list.push(PokemonList {
-            name: value.name.clone(),
-            id: *key,
-        });
-    });
+) -> Vec<PokemonShow> {
+    let mut pokemon_list: Vec<PokemonShow> = db.iter().map(|(_, model)| model.into()).collect();
 
     //sort pokemon_list by name ascending if index_request.sort == Name
     match (index_request.sort_field, index_request.sort_direction) {
@@ -111,10 +106,10 @@ fn index_pokemons(
     };
 
     // filter pokemon_list by index_request.search
-    let pokemon_list: Vec<PokemonList> = pokemon_list
+    let pokemon_list: Vec<PokemonShow> = pokemon_list
         .into_iter()
         .filter(|pokemon| pokemon.name.contains(&index_request.search))
         .collect();
 
-    Ok(pokemon_list)
+    pokemon_list
 }
