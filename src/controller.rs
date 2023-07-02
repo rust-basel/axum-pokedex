@@ -57,30 +57,25 @@ pub async fn delete_pokemon(
 
 #[debug_handler]
 pub async fn update_pokemon(
-    State(db): State<HashMap<usize, Pokemon>>,
+    State(mut db): State<HashMap<usize, Pokemon>>,
     Path(id): Path<usize>,
     Json(update_request): Json<PokemonUpdate>,
 ) -> Result<StatusCode, StatusCode> {
-    match update_request.name {
-        None => Err(StatusCode::BAD_REQUEST),
-        Some(name) => match do_update_pokemon(db, Pokemon { name, id }) {
-            Ok(()) => Ok(StatusCode::NO_CONTENT),
-            Err(PokemonError::NotFound) => Err(StatusCode::NOT_FOUND),
-        },
-    }
-}
-
-// helpers for update and index
-fn do_update_pokemon(
-    mut db: HashMap<usize, Pokemon>,
-    pokemon: Pokemon,
-) -> Result<(), PokemonError> {
-    match db.get_mut(&pokemon.id) {
-        Some(p) => {
-            p.name = pokemon.name;
-            Ok(())
+    let pokemon_to_update = db.get_mut(&id);
+    if let Some(pokemon) = pokemon_to_update {
+        if let Some(nick_name) = update_request.nick_name {
+            pokemon.nick_name = nick_name;
         }
-        None => Err(PokemonError::NotFound),
+        if let Some(name) = update_request.name {
+            pokemon.name = name;
+        }
+        if let Some(pokemon_type) = update_request.pokemon_type {
+            pokemon.pokemon_type = pokemon_type;
+        }
+
+        Ok(StatusCode::NO_CONTENT)
+    } else {
+        Err(StatusCode::NOT_FOUND)
     }
 }
 

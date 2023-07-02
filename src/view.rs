@@ -3,11 +3,17 @@
 pub struct PokemonCreate {
     pub name: String,
     pub id: usize,
+    pub nick_name: String,
+    #[serde(rename = "type")]
+    pub pokemon_type: String,
 }
 
-#[derive(serde::Serialize, serde::Deserialize)]
+#[derive(serde::Serialize, serde::Deserialize, Default)]
 pub struct PokemonUpdate {
     pub name: Option<String>,
+    #[serde(rename = "type")]
+    pub nick_name: Option<String>,
+    pub pokemon_type: Option<String>,
 }
 
 #[derive(serde::Deserialize, serde::Serialize, Debug)]

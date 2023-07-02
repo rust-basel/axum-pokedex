@@ -4,6 +4,8 @@ use crate::view::{PokemonCreate, PokemonShow};
 pub struct Pokemon {
     pub name: String,
     pub id: usize,
+    pub pokemon_type: String,
+    pub nick_name: String,
 }
 
 #[derive(PartialEq, Debug)]
@@ -15,7 +17,9 @@ impl From<PokemonCreate> for Pokemon {
     fn from(value: PokemonCreate) -> Self {
         Pokemon {
             name: value.name,
-            id: 999, //todo
+            id: value.id,
+            pokemon_type: value.pokemon_type,
+            nick_name: value.nick_name,
         }
     }
 }
