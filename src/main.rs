@@ -76,6 +76,15 @@ mod tests {
 
         // then
         assert_eq!(response.status(), StatusCode::CREATED);
+    }
+
+    #[tokio::test]
+    async fn get_pokemon_indexed_given_glumanda_when_called_with_search_then_returns_list_containing_glumanda()
+    {
+        // given
+        let mut initial_db: HashMap<usize, Pokemon> = HashMap::new();
+        initial_db.insert(6, Pokemon{ name: "Glumanda".to_string(), id: 6 });
+        let app = app(initial_db);
 
         let glumanda_list_request = Request::builder()
             .method(http::Method::GET)
@@ -83,21 +92,34 @@ mod tests {
             .body(Body::empty())
             .unwrap();
 
-        let response = &app.clone().oneshot(glumanda_list_request).await.unwrap();
+        // when
+        let response = app.clone().oneshot(glumanda_list_request).await.unwrap();
 
+        // then
         assert_eq!(response.status(), StatusCode::OK);
-        //TODO: check if response body contains Glumanda
+        let body = hyper::body::to_bytes(response.into_body()).await.unwrap();
+        let body: Vec<PokemonShow> = serde_json::from_slice(&body).unwrap();
+        assert_eq!(body[0], PokemonShow{ id: 6, name: "Glumanda".to_string() });
+    }
 
+    #[tokio::test]
+    async fn get_pokemon_indexed_given_empty_db_when_called_then_returns_empty_list(){
+        // given
+        let app = app(HashMap::new());
         let bulbasaur_list_request = Request::builder()
             .method(http::Method::GET)
             .uri("/pokemon/index?sort_field=Name&sort_direction=Ascending&search=Bulbasaur")
             .body(Body::empty())
             .unwrap();
 
-        let response = &app.clone().oneshot(bulbasaur_list_request).await.unwrap();
+        // when
+        let response = app.clone().oneshot(bulbasaur_list_request).await.unwrap();
 
+        // then
         assert_eq!(response.status(), StatusCode::OK);
-        //TODO: result should be empty
+        let body = hyper::body::to_bytes(response.into_body()).await.unwrap();
+        let body: Vec<PokemonShow> = serde_json::from_slice(&body).unwrap();
+        assert!(body.is_empty());
     }
 
     #[tokio::test]
