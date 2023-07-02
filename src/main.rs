@@ -239,4 +239,25 @@ mod tests {
         // then
         assert_eq!(response.status(), StatusCode::NOT_FOUND);
     }
+
+    #[tokio::test]
+    async fn update_pokemon_given_no_pokemon_when_called_then_returns_not_found() {
+        let app = app(HashMap::new());
+        let update_view = PokemonUpdate {
+            ..Default::default()
+        };
+        let some_id = 42;
+        let update_request = Request::builder()
+            .method(http::Method::PATCH)
+            .uri(format!("/format/{some_id}"))
+            .header(http::header::CONTENT_TYPE, "application/json")
+            .body(Body::from(serde_json::to_string(&update_view).unwrap()))
+            .unwrap();
+
+        // when
+        let response = app.oneshot(update_request).await.unwrap();
+
+        // then
+        assert_eq!(response.status(), StatusCode::NOT_FOUND);
+    }
 }
