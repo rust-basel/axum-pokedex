@@ -26,19 +26,13 @@ async fn main() {
         .unwrap();
 }
 
-async fn handler() -> &'static str {
-    "Hello, world!"
-}
-
 fn app(db: HashMap<usize, Pokemon>) -> Router {
     let app = Router::new()
-        .route("/", get(handler))
-        .route("/pokemon/create", post(create_pokemon))
-        .route("/pokemon/index", get(list_pokemon))
         .route("/pokemon", post(create_pokemon))
         .route("/pokemon/:id", get(show_pokemon))
-        .route("/pokemon/:id", delete(delete_pokemon))
         .route("/pokemon/:id", patch(update_pokemon))
+        .route("/pokemon/:id", delete(delete_pokemon))
+        .route("/pokemon/index", get(list_pokemon))
         .with_state(db);
     app
 }
