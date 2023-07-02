@@ -217,25 +217,22 @@ mod tests {
         assert_eq!(response.status(), StatusCode::NO_CONTENT);
     }
 
-    // #[tokio::test]
-    // async fn update_pokemon_when_called_with_none_name_then_returns_http_err_bad_request() {
-    //     // given
-    //     let id = 6;
-    //     let storage = KeyValueStorage::new();
-    //     let app = app(storage);
-    //
-    //     let patch_json_body = PokemonUpdate { name: None };
-    //     let update_request = Request::builder()
-    //         .method(http::Method::PATCH)
-    //         .uri(format!("/pokemon/{id}"))
-    //         .header(http::header::CONTENT_TYPE, "application/json")
-    //         .body(Body::from(serde_json::to_string(&patch_json_body).unwrap()))
-    //         .unwrap();
-    //
-    //     // when
-    //     let response = app.oneshot(update_request).await.unwrap();
-    //
-    //     // then
-    //     assert_eq!(response.status(), StatusCode::BAD_REQUEST);
-    // }
+    #[tokio::test]
+    async fn delete_pokemon_given_no_pokemon_when_called_then_returns_not_found() {
+        // given
+        let id = 9;
+        let app = app(HashMap::new());
+        let delete_request = Request::builder()
+            .method(http::Method::DELETE)
+            .uri(format!("/pokemon/{id}"))
+            .header(http::header::CONTENT_TYPE, "application/json")
+            .body(Body::empty())
+            .unwrap();
+
+        // when
+        let response = app.oneshot(delete_request).await.unwrap();
+
+        // then
+        assert_eq!(response.status(), StatusCode::NOT_FOUND);
+    }
 }

@@ -54,7 +54,7 @@ pub mod controller {
         let mut db = db;
         match db.remove(&id) {
             Some(_) => Ok(StatusCode::NO_CONTENT),
-            None => Err(StatusCode::INTERNAL_SERVER_ERROR),
+            None => Err(StatusCode::NOT_FOUND),
         }
     }
 
