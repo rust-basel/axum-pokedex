@@ -24,7 +24,7 @@ impl From<&Pokemon> for PokemonShow {
         PokemonShow {
             name: p.name.clone(),
             nick_name: p.nick_name.clone(),
-            id: p.number,
+            number: p.number,
             pokemon_type: p.pokemon_type.clone(),
         }
     }

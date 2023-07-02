@@ -112,7 +112,7 @@ mod tests {
         assert_eq!(
             body[0],
             PokemonShow {
-                id: GLUMANDA_ID,
+                number: GLUMANDA_ID,
                 name: GLUMANDA_NAME.to_string(),
                 nick_name: "MyFirePokemon".to_string(),
                 pokemon_type: "Fire".to_string(),
@@ -167,7 +167,7 @@ mod tests {
             PokemonShow {
                 name: GLUMANDA_NAME.to_string(),
                 nick_name: "MyFirePokemon".to_string(),
-                id: GLUMANDA_ID,
+                number: GLUMANDA_ID,
                 pokemon_type: "Fire".to_string(),
             }
         );

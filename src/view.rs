@@ -50,7 +50,7 @@ pub struct PokemonIndexRequest {
 // read models
 #[derive(serde::Serialize, serde::Deserialize, Debug, PartialEq)]
 pub struct PokemonShow {
-    pub id: usize,
+    pub number: usize,
     pub name: String,
     pub nick_name: String,
     #[serde(rename = "type")]
