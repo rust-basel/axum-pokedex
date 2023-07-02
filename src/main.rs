@@ -79,7 +79,7 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn get_pokemon_indexed_given_glumanda_when_called_with_search_then_returns_list_containing_glumanda()
+    async fn index_pokemon_given_glumanda_when_called_with_search_then_returns_list_containing_glumanda()
     {
         // given
         let mut initial_db: HashMap<usize, Pokemon> = HashMap::new();
@@ -103,7 +103,7 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn get_pokemon_indexed_given_empty_db_when_called_then_returns_empty_list(){
+    async fn index_pokemon_indexed_given_empty_db_when_called_then_returns_empty_list(){
         // given
         let app = app(HashMap::new());
         let bulbasaur_list_request = Request::builder()
