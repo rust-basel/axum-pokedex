@@ -22,10 +22,8 @@ pub mod controller {
         // call business logic to create a pokemon
         let pokemon: Pokemon = pokemon_create_request.into();
         let mut db = db;
-        match db.insert(pokemon.id, pokemon) {
-            Some(_) => StatusCode::OK,
-            None => StatusCode::INTERNAL_SERVER_ERROR,
-        }
+        db.insert(pokemon.id, pokemon);
+        StatusCode::CREATED
     }
 
     #[debug_handler]

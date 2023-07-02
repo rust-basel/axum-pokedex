@@ -75,7 +75,7 @@ mod tests {
         let response = &app.clone().oneshot(create_request).await.unwrap();
 
         // then
-        assert_eq!(response.status(), StatusCode::OK);
+        assert_eq!(response.status(), StatusCode::CREATED);
 
         let glumanda_list_request = Request::builder()
             .method(http::Method::GET)
