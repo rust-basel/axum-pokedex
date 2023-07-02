@@ -1,4 +1,3 @@
-// write models
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct PokemonCreate {
     pub name: String,
@@ -47,7 +46,6 @@ pub struct PokemonIndexRequest {
     pub search: String,
 }
 
-// read models
 #[derive(serde::Serialize, serde::Deserialize, Debug, PartialEq)]
 pub struct PokemonShow {
     pub number: usize,
