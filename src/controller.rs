@@ -8,14 +8,12 @@ use axum::{
     http::StatusCode,
     Json,
 };
-use axum_macros::debug_handler;
 use std::collections::HashMap;
 use std::ops::DerefMut;
 use std::sync::{Arc, Mutex};
 
 type ThreadSafeDb = Arc<Mutex<HashMap<usize, Pokemon>>>;
 
-#[debug_handler]
 pub async fn create_pokemon(
     State(db): State<ThreadSafeDb>,
     Json(pokemon_create_request): Json<PokemonCreate>,
@@ -26,7 +24,6 @@ pub async fn create_pokemon(
     StatusCode::CREATED
 }
 
-#[debug_handler]
 pub async fn list_pokemon(
     State(db): State<ThreadSafeDb>,
     index_request: extract::Query<PokemonIndexRequest>,
@@ -36,7 +33,6 @@ pub async fn list_pokemon(
     Json(pokemons)
 }
 
-#[debug_handler]
 pub async fn show_pokemon(
     State(db): State<ThreadSafeDb>,
     Path(id): Path<usize>,
@@ -48,7 +44,6 @@ pub async fn show_pokemon(
     }
 }
 
-#[debug_handler]
 pub async fn delete_pokemon(
     State(db): State<ThreadSafeDb>,
     Path(id): Path<usize>,
@@ -60,7 +55,6 @@ pub async fn delete_pokemon(
     }
 }
 
-#[debug_handler]
 pub async fn update_pokemon(
     State(db): State<ThreadSafeDb>,
     Path(id): Path<usize>,
