@@ -52,10 +52,7 @@ pub struct PokemonIndexRequest {
 pub struct PokemonShow {
     pub id: usize,
     pub name: String,
-}
-
-#[derive(serde::Serialize, serde::Deserialize)]
-pub struct PokemonList {
-    pub id: usize,
-    pub name: String,
+    pub nick_name: String,
+    #[serde(rename = "type")]
+    pub pokemon_type: String,
 }

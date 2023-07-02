@@ -28,7 +28,9 @@ impl From<&Pokemon> for PokemonShow {
     fn from(p: &Pokemon) -> Self {
         PokemonShow {
             name: p.name.clone(),
-            id: p.id.clone(),
+            nick_name: p.nick_name.clone(),
+            id: p.id,
+            pokemon_type: p.pokemon_type.clone(),
         }
     }
 }

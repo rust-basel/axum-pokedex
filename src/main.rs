@@ -117,7 +117,9 @@ mod tests {
             body[0],
             PokemonShow {
                 id: GLUMANDA_ID,
-                name: GLUMANDA_NAME.to_string()
+                name: GLUMANDA_NAME.to_string(),
+                nick_name: "MyFirePokemon".to_string(),
+                pokemon_type: "Fire".to_string(),
             }
         );
     }
@@ -168,7 +170,9 @@ mod tests {
             body,
             PokemonShow {
                 name: GLUMANDA_NAME.to_string(),
+                nick_name: "MyFirePokemon".to_string(),
                 id: GLUMANDA_ID,
+                pokemon_type: "Fire".to_string(),
             }
         );
     }

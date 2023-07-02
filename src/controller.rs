@@ -1,6 +1,6 @@
 use crate::model::{Pokemon, PokemonError};
 use crate::view::{
-    Direction, PokemonCreate, PokemonIndexField, PokemonIndexRequest, PokemonList, PokemonShow,
+    Direction, PokemonCreate, PokemonIndexField, PokemonIndexRequest, PokemonShow,
     PokemonUpdate,
 };
 use axum::extract::Path;
@@ -27,7 +27,7 @@ pub async fn create_pokemon(
 pub async fn list_pokemon(
     State(db): State<HashMap<usize, Pokemon>>,
     index_request: extract::Query<PokemonIndexRequest>,
-) -> Json<Vec<PokemonList>> {
+) -> Json<Vec<PokemonShow>> {
     let pokemons = index_pokemons(db, index_request.0).unwrap_or(vec![]);
     Json(pokemons)
 }
@@ -82,14 +82,8 @@ pub async fn update_pokemon(
 fn index_pokemons(
     db: HashMap<usize, Pokemon>,
     index_request: PokemonIndexRequest,
-) -> Result<Vec<PokemonList>, PokemonError> {
-    let mut pokemon_list: Vec<PokemonList> = Vec::new();
-    db.iter().for_each(|(key, value)| {
-        pokemon_list.push(PokemonList {
-            name: value.name.clone(),
-            id: *key,
-        });
-    });
+) -> Result<Vec<PokemonShow>, PokemonError> {
+    let mut pokemon_list: Vec<PokemonShow> = db.iter().map(|(_, model)| model.into()).collect();
 
     //sort pokemon_list by name ascending if index_request.sort == Name
     match (index_request.sort_field, index_request.sort_direction) {
@@ -106,7 +100,7 @@ fn index_pokemons(
     };
 
     // filter pokemon_list by index_request.search
-    let pokemon_list: Vec<PokemonList> = pokemon_list
+    let pokemon_list: Vec<PokemonShow> = pokemon_list
         .into_iter()
         .filter(|pokemon| pokemon.name.contains(&index_request.search))
         .collect();
