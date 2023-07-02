@@ -10,32 +10,38 @@ use axum::{
 };
 use axum_macros::debug_handler;
 use std::collections::HashMap;
+use std::ops::DerefMut;
+use std::sync::{Arc, Mutex};
+
+type ThreadSafeDb = Arc<Mutex<HashMap<usize, Pokemon>>>;
 
 #[debug_handler]
 pub async fn create_pokemon(
-    State(db): State<HashMap<usize, Pokemon>>,
+    State(db): State<ThreadSafeDb>,
     Json(pokemon_create_request): Json<PokemonCreate>,
 ) -> StatusCode {
+    let mut db = db.lock().unwrap();
     let pokemon: Pokemon = pokemon_create_request.into();
-    let mut db = db;
     db.insert(pokemon.number, pokemon);
     StatusCode::CREATED
 }
 
 #[debug_handler]
 pub async fn list_pokemon(
-    State(db): State<HashMap<usize, Pokemon>>,
+    State(db): State<ThreadSafeDb>,
     index_request: extract::Query<PokemonIndexRequest>,
 ) -> Json<Vec<PokemonShow>> {
-    let pokemons = index_pokemons(db, index_request.0);
+    let mut db = db.lock().unwrap();
+    let pokemons = index_pokemons(db.deref_mut(), index_request.0);
     Json(pokemons)
 }
 
 #[debug_handler]
 pub async fn show_pokemon(
-    State(db): State<HashMap<usize, Pokemon>>,
+    State(db): State<ThreadSafeDb>,
     Path(id): Path<usize>,
 ) -> Result<Json<PokemonShow>, StatusCode> {
+    let db = db.lock().unwrap();
     match db.get(&id) {
         Some(pokemon) => Ok(Json(PokemonShow::from(pokemon))),
         None => Err(StatusCode::NOT_FOUND),
@@ -44,10 +50,10 @@ pub async fn show_pokemon(
 
 #[debug_handler]
 pub async fn delete_pokemon(
-    State(db): State<HashMap<usize, Pokemon>>,
+    State(db): State<ThreadSafeDb>,
     Path(id): Path<usize>,
 ) -> Result<StatusCode, StatusCode> {
-    let mut db = db;
+    let mut db = db.lock().unwrap();
     match db.remove(&id) {
         Some(_) => Ok(StatusCode::NO_CONTENT),
         None => Err(StatusCode::NOT_FOUND),
@@ -56,10 +62,11 @@ pub async fn delete_pokemon(
 
 #[debug_handler]
 pub async fn update_pokemon(
-    State(mut db): State<HashMap<usize, Pokemon>>,
+    State(db): State<ThreadSafeDb>,
     Path(id): Path<usize>,
     Json(update_request): Json<PokemonUpdate>,
 ) -> Result<StatusCode, StatusCode> {
+    let mut db = db.lock().unwrap();
     let pokemon_to_update = db.get_mut(&id);
     if let Some(pokemon) = pokemon_to_update {
         if let Some(nick_name) = update_request.nick_name {
@@ -79,7 +86,7 @@ pub async fn update_pokemon(
 }
 
 fn index_pokemons(
-    db: HashMap<usize, Pokemon>,
+    db: &mut HashMap<usize, Pokemon>,
     index_request: PokemonIndexRequest,
 ) -> Vec<PokemonShow> {
     let mut pokemon_list: Vec<PokemonShow> = db.iter().map(|(_, model)| model.into()).collect();

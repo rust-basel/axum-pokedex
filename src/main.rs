@@ -8,6 +8,7 @@ use axum::{
 };
 use std::collections::HashMap;
 use std::net::SocketAddr;
+use std::sync::{Arc, Mutex};
 
 mod controller;
 mod model;
@@ -27,13 +28,14 @@ async fn main() {
 }
 
 fn app(db: HashMap<usize, Pokemon>) -> Router {
+    let thread_safe_db = Arc::new(Mutex::new(db));
     let app = Router::new()
         .route("/pokemon", post(create_pokemon))
         .route("/pokemon/:id", get(show_pokemon))
         .route("/pokemon/:id", patch(update_pokemon))
         .route("/pokemon/:id", delete(delete_pokemon))
         .route("/pokemon/index", get(list_pokemon))
-        .with_state(db);
+        .with_state(thread_safe_db);
     app
 }
 
